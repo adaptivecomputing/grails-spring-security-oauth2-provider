@@ -193,7 +193,7 @@ class GormTokenStore implements TokenStore {
 	 * @param refreshToken The refresh token.
 	 */
 	void removeAccessTokenUsingRefreshToken(String refreshToken) {
-		def accessToken = oauth2.OAuthAccessToken.findByRefreshToken tokenValue
+		def accessToken = oauth2.OAuthAccessToken.findByRefreshToken refreshToken
 		if (accessToken) {
 			oauth2.OAuthAccessToken.withTransaction { status ->
 				accessToken.delete()
