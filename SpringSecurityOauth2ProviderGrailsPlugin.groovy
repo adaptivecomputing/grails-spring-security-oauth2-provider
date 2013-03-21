@@ -78,8 +78,8 @@ OAuth2 Provider support for the Spring Security plugin.
 
 		log.debug 'Configuring Spring Security OAuth2 provider ...'
 		
-		clientDetailsService(InMemoryClientDetailsService)
-		tokenStore(InMemoryTokenStore)
+		clientDetailsService(conf.oauthProvider.clientDetailsServiceClass ?: InMemoryClientDetailsService)
+		tokenStore(conf.oauthProvider.tokenStoreClass ?: InMemoryTokenStore)
 		tokenServices(RandomValueTokenServices) {
 			tokenStore = ref("tokenStore")
 			accessTokenValiditySeconds = conf.oauthProvider.tokenServices.accessTokenValiditySeconds

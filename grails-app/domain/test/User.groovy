@@ -17,6 +17,7 @@ class User {
 	}
 
 	static mapping = {
+		autoImport false
 		password column: '`password`'
 	}
 
