@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 import org.apache.log4j.Logger;
+import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices
 import org.springframework.security.oauth2.provider.BaseClientDetails
@@ -121,16 +122,17 @@ OAuth2 Provider support for the Spring Security plugin.
 			
 		// Register endpoint URL filter since we define the URLs above
 		SpringSecurityUtils.registerFilter 'oauth2EndpointUrlFilter',
-				conf.oauthProvider.filterStartPosition + 1
+				conf.oauthProvider.endpointUrlFilterPosition
 				
 		oauth2ExceptionHandlerFilter(OAuth2ExceptionHandlerFilter)
 		SpringSecurityUtils.registerFilter 'oauth2ExceptionHandlerFilter',
-				conf.oauthProvider.filterStartPosition + 2
+				conf.oauthProvider.exceptionHandlerFilterPosition
+		
 		oauth2ProtectedResourceFilter(OAuth2ProtectedResourceFilter) {
 			tokenServices = ref("tokenServices")
 		}
 		SpringSecurityUtils.registerFilter 'oauth2ProtectedResourceFilter',
-				conf.oauthProvider.filterStartPosition + 3
+				conf.oauthProvider.protectedResourceFilterPosition
 		
 		log.debug "... done configured Spring Security OAuth2 provider"
 	}

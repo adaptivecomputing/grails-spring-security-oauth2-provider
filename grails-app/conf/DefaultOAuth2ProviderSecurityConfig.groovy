@@ -24,6 +24,9 @@ security {
 		tokenStoreClass = InMemoryTokenStore
 		active = true
 		filterStartPosition = SecurityFilterPosition.EXCEPTION_TRANSLATION_FILTER.order
+		endpointUrlFilterPosition = filterStartPosition + 1
+		exceptionHandlerFilterPosition = filterStartPosition + 2
+		protectedResourceFilterPosition = filterStartPosition + 3
 		
 		authorizationCode {
 			approvalParameterName = "user_oauth_approval"
