@@ -6,6 +6,7 @@ class Role {
 
 	static mapping = {
 		autoImport false
+		table 'test_role'
 		cache true
 	}
 

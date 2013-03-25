@@ -18,6 +18,7 @@ class User {
 
 	static mapping = {
 		autoImport false
+		table 'test_user'
 		password column: '`password`'
 	}
 
