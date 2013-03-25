@@ -31,6 +31,7 @@ class OAuthClient {
 	
 	static constraints = {
 		clientId blank: false, nullable: false, unique: true
+		resourceIds nullable: true
 		scope nullable: true
 		webServerRedirectUri nullable: true
 		authorities nullable: true
