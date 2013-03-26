@@ -15,10 +15,14 @@
  */
 package oauth2
 
+import org.springframework.security.oauth2.common.OAuth2AccessToken
+
 class OAuthAccessToken {
 	
 	String tokenId
-	byte[] token
+	Date expiration
+	String tokenType
+	String scope
 	byte[] authentication
 	String refreshToken
 	String username
@@ -31,5 +35,28 @@ class OAuthAccessToken {
 	
 	static mapping = {
 		version false
+	}
+	
+	def populateScope(scopeSet) {
+		def scopeString = ""
+		scopeSet?.each { scope ->
+			scopeString += scope + " "
+		}
+		this.scope = scopeString.trim()
+	}
+	
+	def toAccessToken() {
+		def token = new OAuth2AccessToken(tokenId)
+		token.expiration = expiration
+		token.tokenType = tokenType
+		def refreshToken = OAuthRefreshToken.findByTokenId refreshToken
+		token.refreshToken = refreshToken.toRefreshToken()
+		
+		def scopeSet = new HashSet<String>();
+		scope?.split()?.each { scopePart ->
+			scopeSet.add scopePart
+		}
+		token.scope = scopeSet
+		token
 	}
 }

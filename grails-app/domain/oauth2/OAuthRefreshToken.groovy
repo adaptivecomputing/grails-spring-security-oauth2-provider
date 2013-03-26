@@ -15,10 +15,12 @@
  */
 package oauth2
 
+import org.springframework.security.oauth2.common.ExpiringOAuth2RefreshToken
+
 class OAuthRefreshToken {
 	
 	String tokenId
-	byte[] token
+	Date expiration
 	byte[] authentication
 	String username
 	
@@ -30,5 +32,9 @@ class OAuthRefreshToken {
 	
 	static mapping = {
 		version false
+	}
+	
+	def toRefreshToken() {
+		new ExpiringOAuth2RefreshToken(tokenId, expiration)
 	}
 }

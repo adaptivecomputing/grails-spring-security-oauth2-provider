@@ -61,11 +61,13 @@ class GormTokenStore implements TokenStore {
 	void storeAccessToken(OAuth2AccessToken token, OAuth2Authentication authentication) {
 		def accessToken = new oauth2.OAuthAccessToken(
 			tokenId: token.value,
-			token: SerializationUtils.serialize(token),
+			expiration: token.expiration,
+			tokenType: token.tokenType,
 			authentication: SerializationUtils.serialize(authentication),
 			refreshToken: token.refreshToken?.value,
 			username: authentication.name
 		)
+		accessToken.populateScope(token.scope)
 		oauth2.OAuthAccessToken.withTransaction { status ->
 			accessToken.save()
 		}
@@ -82,12 +84,7 @@ class GormTokenStore implements TokenStore {
 		def token = null
 		if (accessToken) {
 			log.debug "Found access token for token: $tokenValue"
-			try {
-				token = deserialize(accessToken.token)
-			} catch (RuntimeException e) {
-				log.error "Failed to deserialize access token for token: $token"
-				log.error e
-			}
+			token = accessToken.toAccessToken()
 		} else {
 			log.info "Failed to find access token for token: $tokenValue"
 		}
@@ -140,7 +137,7 @@ class GormTokenStore implements TokenStore {
 	void storeRefreshToken(ExpiringOAuth2RefreshToken token, OAuth2Authentication authentication) {
 		def refreshToken = new oauth2.OAuthRefreshToken(
 			tokenId: token.value,
-			token: SerializationUtils.serialize(token),
+			expiration: token.expiration,
 			authentication: SerializationUtils.serialize(authentication),
 			username: authentication.name
 		)
@@ -160,12 +157,7 @@ class GormTokenStore implements TokenStore {
 		def token = null
 		if (refreshToken) {
 			log.debug "Found refresh token for token: $tokenValue"
-			try {
-				token = deserialize(refreshToken.token)
-			} catch (RuntimeException e) {
-				log.error "Failed to deserialize access token for token: $token"
-				log.error e
-			}
+			token = refreshToken.toRefreshToken()
 		} else {
 			log.info "Failed to find refresh token for token: $tokenValue"
 		}
