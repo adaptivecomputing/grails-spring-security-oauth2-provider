@@ -84,7 +84,7 @@ class GormTokenStore implements TokenStore {
 		def token = null
 		if (accessToken) {
 			log.debug "Found access token for token: $tokenValue"
-			token = accessToken.toAccessToken()
+			token = accessToken.toToken()
 		} else {
 			log.info "Failed to find access token for token: $tokenValue"
 		}
@@ -157,7 +157,7 @@ class GormTokenStore implements TokenStore {
 		def token = null
 		if (refreshToken) {
 			log.debug "Found refresh token for token: $tokenValue"
-			token = refreshToken.toRefreshToken()
+			token = refreshToken.toToken()
 		} else {
 			log.info "Failed to find refresh token for token: $tokenValue"
 		}

@@ -31,6 +31,7 @@ class OAuthAccessToken {
 	
 	static constraints = {
 		tokenId blank: false, nullable: false, unique: true
+		refreshToken nullable: true
 	}
 	
 	static mapping = {
@@ -45,12 +46,13 @@ class OAuthAccessToken {
 		this.scope = scopeString.trim()
 	}
 	
-	def toAccessToken() {
+	def toToken() {
 		def token = new OAuth2AccessToken(tokenId)
 		token.expiration = expiration
 		token.tokenType = tokenType
-		def refreshToken = OAuthRefreshToken.findByTokenId refreshToken
-		token.refreshToken = refreshToken.toRefreshToken()
+		if (refreshToken) {
+			token.refreshToken = OAuthRefreshToken.findByTokenId(refreshToken)?.toToken()
+		}
 		
 		def scopeSet = new HashSet<String>();
 		scope?.split()?.each { scopePart ->

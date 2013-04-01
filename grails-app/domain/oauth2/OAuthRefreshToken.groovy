@@ -34,7 +34,7 @@ class OAuthRefreshToken {
 		version false
 	}
 	
-	def toRefreshToken() {
+	def toToken() {
 		new ExpiringOAuth2RefreshToken(tokenId, expiration)
 	}
 }
