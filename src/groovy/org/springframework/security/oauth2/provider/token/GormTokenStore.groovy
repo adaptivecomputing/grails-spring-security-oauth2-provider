@@ -65,7 +65,8 @@ class GormTokenStore implements TokenStore {
 			tokenType: token.tokenType,
 			authentication: SerializationUtils.serialize(authentication),
 			refreshToken: token.refreshToken?.value,
-			username: authentication.name
+			username: authentication.name,
+			clientId: authentication.clientAuthentication.clientId
 		)
 		accessToken.populateScope(token.scope)
 		oauth2.OAuthAccessToken.withTransaction { status ->

@@ -26,6 +26,7 @@ class OAuthAccessToken {
 	byte[] authentication
 	String refreshToken
 	String username
+	String clientId
 	
 	Date dateCreated
 	
