@@ -16,12 +16,14 @@
 import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
 
 import org.springframework.security.oauth2.provider.InMemoryClientDetailsService
+import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices
 import org.springframework.security.oauth2.provider.token.InMemoryTokenStore
 
 security {
 	oauthProvider {
 		clientDetailsServiceClass = InMemoryClientDetailsService
 		tokenStoreClass = InMemoryTokenStore
+		authorizationCodeServicesClass = InMemoryAuthorizationCodeServices
 		active = true
 		filterStartPosition = SecurityFilterPosition.EXCEPTION_TRANSLATION_FILTER.order
 		endpointUrlFilterPosition = filterStartPosition + 1

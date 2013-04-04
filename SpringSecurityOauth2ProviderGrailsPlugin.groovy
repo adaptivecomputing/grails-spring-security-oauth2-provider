@@ -88,7 +88,7 @@ OAuth2 Provider support for the Spring Security plugin.
 			reuseRefreshToken = conf.oauthProvider.tokenServices.reuseRefreshToken
 			supportRefreshToken = conf.oauthProvider.tokenServices.supportRefreshToken
 		}
-		authorizationCodeServices(InMemoryAuthorizationCodeServices)
+		authorizationCodeServices(conf.oauthProvider.authorizationCodeServicesClass ?: InMemoryAuthorizationCodeServices)
 		
 		// Oauth namespace
 		xmlns oauth:"http://www.springframework.org/schema/security/oauth2"
