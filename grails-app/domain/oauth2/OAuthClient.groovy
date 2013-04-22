@@ -20,6 +20,8 @@ import org.springframework.security.oauth2.provider.*
 class OAuthClient {
 	
 	String clientId
+	String displayName
+	String displayLink
 	String resourceIds
 	String clientSecret
 	String scope
@@ -31,6 +33,8 @@ class OAuthClient {
 	
 	static constraints = {
 		clientId blank: false, nullable: false, unique: true
+		displayName nullable: true
+		displayLink nullable: true
 		resourceIds nullable: true
 		scope nullable: true
 		webServerRedirectUri nullable: true
