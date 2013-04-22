@@ -180,6 +180,16 @@ but is untested.  If you have tested this plugin in these configurations, please
 
 ## Configuration
 
+### Token and Client persistence
+By default, in memory implementations of both TokenStore and ClientDetailsService are used, but if you wish for clients and tokens to be persisted to a database, the following options are accepted:
+
+```groovy
+grails.plugins.springsecurity.oauthProvider.clientDetailsServiceClass = org.springframework.security.oauth2.provider.GormClientDetailsService
+grails.plugins.springsecurity.oauthProvider.tokenStoreClass = org.springframework.security.oauth2.provider.token.GormTokenStore
+```
+
+NOTE: You will need to setup relevant tables in your database for the OAuthClient, OAuthRefreshToken, and OAuthAccessToken classes, through whatever means are available to you in your app.  One such possibility would be "dbm-gorm-diff" as provided by the Grails Database Migration Plugin:  http://grails.org/plugin/database-migration
+
 ### Endpoint URLs
 
 By default, three endpoint URLs have been defined.  Note that default URLMappings are provided for the 

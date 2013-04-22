@@ -15,17 +15,27 @@
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
 
+import org.springframework.security.oauth2.provider.InMemoryClientDetailsService
+import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices
+import org.springframework.security.oauth2.provider.token.InMemoryTokenStore
+
 security {
 	oauthProvider {
+		clientDetailsServiceClass = InMemoryClientDetailsService
+		tokenStoreClass = InMemoryTokenStore
+		authorizationCodeServicesClass = InMemoryAuthorizationCodeServices
 		active = true
 		filterStartPosition = SecurityFilterPosition.EXCEPTION_TRANSLATION_FILTER.order
+		endpointUrlFilterPosition = filterStartPosition + 1
+		exceptionHandlerFilterPosition = filterStartPosition + 2
+		protectedResourceFilterPosition = filterStartPosition + 3
 		
 		authorizationCode {
 			approvalParameterName = "user_oauth_approval"
 		}
 		tokenServices {
 			accessTokenValiditySeconds = 60 * 60 * 12 //default 12 hours
-			refreshTokenValiditySeconds = 60 * 10 //default 10 minutes
+			refreshTokenValiditySeconds = 60 * 60 * 24 * 60 //default 60 days
 			reuseRefreshToken = true
 			supportRefreshToken = true
 		}
