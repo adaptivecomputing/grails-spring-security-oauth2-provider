@@ -38,6 +38,7 @@ import org.springframework.security.oauth2.provider.CompositeTokenGranter
 import org.springframework.security.oauth2.provider.approval.ApprovalStoreUserApprovalHandler
 import org.springframework.security.oauth2.provider.approval.DefaultUserApprovalHandler
 import org.springframework.security.oauth2.provider.approval.TokenStoreUserApprovalHandler
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetailsSource
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter
 import org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter
@@ -56,6 +57,7 @@ import org.springframework.security.oauth2.provider.token.DefaultAuthenticationK
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
 import org.springframework.security.web.access.ExceptionTranslationFilter
 import org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint
+import org.springframework.security.web.authentication.NullRememberMeServices
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.savedrequest.NullRequestCache
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
@@ -480,11 +482,17 @@ class SpringSecurityOauth2ProviderGrailsPlugin {
         boolean registerBasicAuthFilter = conf.oauthProvider.registerBasicAuthFilter as boolean
 
         if(registerBasicAuthFilter) {
-            // This defines the bean using the alternative constructor that sets ignoreFailure to true,
-            // as an alternative to the filter offered by the Spring Security Core plugin:
-            basicAuthenticationFilter(BasicAuthenticationFilter, ref('authenticationManager', ref('oauth2AuthenticationEntryPoint'))) {
-                authenticationDetailsSource = ref('authenticationDetailsSource')
-                rememberMeServices = ref('rememberMeServices')
+            // The rememberMeServices registered by the Core plugin is an instance of either
+            // PersistentTokenBasedRememberMeServices or TokenBasedRememberMeServices.
+            // Since we want this to be stateless, we should provide an instance of NullRememberMeServices instead.
+            statelessRememberMeServices(NullRememberMeServices)
+
+            // provides OAuth2 specific details
+            oauth2AuthenticationDetailsSource(OAuth2AuthenticationDetailsSource)
+
+            basicAuthenticationFilter(BasicAuthenticationFilter, ref('authenticationManager'), ref('oauth2AuthenticationEntryPoint')) {
+                authenticationDetailsSource = ref('oauth2AuthenticationDetailsSource')
+                rememberMeServices = ref('statelessRememberMeServices')
                 credentialsCharset = conf.basic.credentialsCharset
             }
 
