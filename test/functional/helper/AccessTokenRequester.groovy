@@ -16,6 +16,7 @@ class AccessTokenRequester {
     }
 
     static String getAccessToken(Map params) {
+        params = params.clone() // Don't mess with the original Map
         String clientId = params.remove('client_id')
         String clientSecret = params.remove('client_secret') ?: ''
 
