@@ -56,6 +56,7 @@ import org.springframework.security.oauth2.provider.token.DefaultAuthenticationK
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
 import org.springframework.security.web.access.ExceptionTranslationFilter
 import org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.savedrequest.NullRequestCache
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
@@ -170,6 +171,10 @@ class SpringSecurityOauth2ProviderGrailsPlugin {
         /* Access to OAuth2 resources and the token endpoint must be stateless */
         configureStatelessFilters.delegate = delegate
         configureStatelessFilters(conf)
+
+        /* Enable HTTP Basic Authentication for client credentials */
+        configureBasicAuthenticationFilter.delegate = delegate
+        configureBasicAuthenticationFilter(conf)
 
 		println "... done configuring Spring Security OAuth2 provider"
 	}
@@ -467,6 +472,26 @@ class SpringSecurityOauth2ProviderGrailsPlugin {
             // where necessary to meet their needs
             SpringSecurityUtils.registerFilter 'oauth2ExceptionTranslationFilter',
                     conf.oauthProvider.exceptionTranslationFilterStartPosition + 1
+        }
+    }
+
+    private configureBasicAuthenticationFilter = { conf ->
+        // Should the basic authentication filter be registered in the filter chain
+        boolean registerBasicAuthFilter = conf.oauthProvider.registerBasicAuthFilter as boolean
+
+        if(registerBasicAuthFilter) {
+            // This defines the bean using the alternative constructor that sets ignoreFailure to true,
+            // as an alternative to the filter offered by the Spring Security Core plugin:
+            basicAuthenticationFilter(BasicAuthenticationFilter, ref('authenticationManager')) {
+                authenticationDetailsSource = ref('authenticationDetailsSource')
+                rememberMeServices = ref('rememberMeServices')
+                credentialsCharset = conf.basic.credentialsCharset
+            }
+
+            // We add the basic authentication filter to the chain by default and require the plugin consumer to remove
+            // basicAuthenticationFilter from the filter chain where appropriate
+            SpringSecurityUtils.registerFilter 'basicAuthenticationFilter',
+                    conf.oauthProvider.basicAuthFilterStartPosition
         }
     }
 

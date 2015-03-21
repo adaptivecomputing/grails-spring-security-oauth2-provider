@@ -16,7 +16,13 @@ class AccessTokenRequester {
     }
 
     static String getAccessToken(Map params) {
-        def response = requestAccessToken(params)
+        String clientId = params.remove('client_id')
+        String clientSecret = params.remove('client_secret') ?: ''
+
+        def response = clientId != null ?
+                requestAccessTokenWithBasicAuth(params, clientId, clientSecret) :
+                requestAccessToken(params)
+
         return response.data.access_token
     }
 
