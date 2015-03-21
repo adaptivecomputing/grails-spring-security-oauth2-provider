@@ -482,7 +482,7 @@ class SpringSecurityOauth2ProviderGrailsPlugin {
         if(registerBasicAuthFilter) {
             // This defines the bean using the alternative constructor that sets ignoreFailure to true,
             // as an alternative to the filter offered by the Spring Security Core plugin:
-            basicAuthenticationFilter(BasicAuthenticationFilter, ref('authenticationManager')) {
+            basicAuthenticationFilter(BasicAuthenticationFilter, ref('authenticationManager', ref('oauth2AuthenticationEntryPoint'))) {
                 authenticationDetailsSource = ref('authenticationDetailsSource')
                 rememberMeServices = ref('rememberMeServices')
                 credentialsCharset = conf.basic.credentialsCharset
