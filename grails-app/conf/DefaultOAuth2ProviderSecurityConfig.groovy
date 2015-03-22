@@ -29,6 +29,9 @@ security {
         statelessFilterStartPosition = SecurityFilterPosition.SECURITY_CONTEXT_FILTER.order
         registerStatelessFilter = true
 
+        basicAuthFilterStartPosition = SecurityFilterPosition.BASIC_AUTH_FILTER.order
+        registerBasicAuthFilter = true
+
         realmName = 'Grails OAuth2 Realm'
 
         tokenServices {

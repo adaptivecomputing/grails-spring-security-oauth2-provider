@@ -1,7 +1,9 @@
 
 log4j = {
-    debug  'grails.plugin.springsecurity.oauthprovider',
-            'test.oauth2'
+    debug   'grails.plugin.springsecurity.oauthprovider',
+            'test.oauth2',
+            'org.springframework.security.oauth2.provider.authentication',
+            'org.springframework.security.authentication'
 
 	warn	'grails.plugin.springsecurity',
 			'org.springframework.security'
@@ -36,7 +38,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 ]
 
 grails.plugin.springsecurity.providerNames = [
-        'clientCredentialsAuthenticationProvider',
+//        'clientCredentialsAuthenticationProvider',
         'daoAuthenticationProvider',
         'anonymousAuthenticationProvider',
         'rememberMeAuthenticationProvider'

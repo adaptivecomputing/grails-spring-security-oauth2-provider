@@ -33,11 +33,13 @@ import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
 import org.springframework.http.converter.xml.SourceHttpMessageConverter
+import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.oauth2.provider.CompositeTokenGranter
 import org.springframework.security.oauth2.provider.approval.ApprovalStoreUserApprovalHandler
 import org.springframework.security.oauth2.provider.approval.DefaultUserApprovalHandler
 import org.springframework.security.oauth2.provider.approval.TokenStoreUserApprovalHandler
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetailsSource
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter
 import org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter
@@ -54,8 +56,11 @@ import org.springframework.security.oauth2.provider.password.ResourceOwnerPasswo
 import org.springframework.security.oauth2.provider.refresh.RefreshTokenGranter
 import org.springframework.security.oauth2.provider.token.DefaultAuthenticationKeyGenerator
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
+import org.springframework.security.web.access.AccessDeniedHandlerImpl
 import org.springframework.security.web.access.ExceptionTranslationFilter
 import org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint
+import org.springframework.security.web.authentication.NullRememberMeServices
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.savedrequest.NullRequestCache
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
@@ -170,6 +175,10 @@ class SpringSecurityOauth2ProviderGrailsPlugin {
         /* Access to OAuth2 resources and the token endpoint must be stateless */
         configureStatelessFilters.delegate = delegate
         configureStatelessFilters(conf)
+
+        /* Enable HTTP Basic Authentication for client credentials */
+        configureBasicAuthenticationFilter.delegate = delegate
+        configureBasicAuthenticationFilter(conf)
 
 		println "... done configuring Spring Security OAuth2 provider"
 	}
@@ -467,6 +476,38 @@ class SpringSecurityOauth2ProviderGrailsPlugin {
             // where necessary to meet their needs
             SpringSecurityUtils.registerFilter 'oauth2ExceptionTranslationFilter',
                     conf.oauthProvider.exceptionTranslationFilterStartPosition + 1
+        }
+    }
+
+    private configureBasicAuthenticationFilter = { conf ->
+        // Should the basic authentication filter be registered in the filter chain
+        boolean registerBasicAuthFilter = conf.oauthProvider.registerBasicAuthFilter as boolean
+
+        if(registerBasicAuthFilter) {
+            // The rememberMeServices registered by the Core plugin is an instance of either
+            // PersistentTokenBasedRememberMeServices or TokenBasedRememberMeServices.
+            // Since we want this to be stateless, we should provide an instance of NullRememberMeServices instead.
+            statelessRememberMeServices(NullRememberMeServices)
+
+            // provides OAuth2 specific details
+            oauth2AuthenticationDetailsSource(OAuth2AuthenticationDetailsSource)
+
+            basicClientAuthenticationManager(ProviderManager) {
+                providers = [ ref('clientCredentialsAuthenticationProvider') ]
+                authenticationEventPublisher = ref('authenticationEventPublisher')
+                eraseCredentialsAfterAuthentication = conf.providerManager.eraseCredentialsAfterAuthentication // true
+            }
+
+            basicAuthenticationFilter(BasicAuthenticationFilter, ref('basicClientAuthenticationManager'), ref('oauth2AuthenticationEntryPoint')) {
+                authenticationDetailsSource = ref('oauth2AuthenticationDetailsSource')
+                rememberMeServices = ref('statelessRememberMeServices')
+                credentialsCharset = conf.basic.credentialsCharset
+            }
+
+            // We add the basic authentication filter to the chain by default and require the plugin consumer to remove
+            // basicAuthenticationFilter from the filter chain where appropriate
+            SpringSecurityUtils.registerFilter 'basicAuthenticationFilter',
+                    conf.oauthProvider.basicAuthFilterStartPosition
         }
     }
 

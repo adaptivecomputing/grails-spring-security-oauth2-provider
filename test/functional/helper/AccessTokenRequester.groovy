@@ -7,12 +7,21 @@ import groovyx.net.http.RESTClient
 class AccessTokenRequester {
 
     private static RESTClient restClient = new RESTClient()
+    private static final boolean USE_HTTP_BASIC = true
 
     private static final BASE_URL = System.getProperty(BuildSettings.FUNCTIONAL_BASE_URL_PROPERTY)
     static final TOKEN_ENDPOINT_URL = BASE_URL + 'oauth/token'
 
-    static HttpResponseDecorator requestAccessToken(Map params) {
-        restClient.post(uri: TOKEN_ENDPOINT_URL, query: params)
+    static HttpResponseDecorator requestAccessToken(Map requestParams) {
+        if (USE_HTTP_BASIC) {
+            Map params = requestParams.clone() // Don't mess with the original Map
+            String clientId = params.remove('client_id')
+            String clientSecret = params.remove('client_secret') ?: ''
+
+            requestAccessTokenWithBasicAuth(params, clientId, clientSecret)
+        } else {
+            restClient.post(uri: TOKEN_ENDPOINT_URL, query: requestParams)
+        }
     }
 
     static String getAccessToken(Map params) {
@@ -27,7 +36,7 @@ class AccessTokenRequester {
 
     static HttpResponseDecorator requestAccessTokenWithBasicAuth(Map params, String clientId, String clientSecret) {
         def basicAuth = "$clientId:$clientSecret".bytes.encodeBase64()
-        def headers = [Authorization: "Basic $basicAuth"]
+        def headers = clientId ? [Authorization: "Basic $basicAuth"] : [:]
         restClient.post(uri: TOKEN_ENDPOINT_URL, query: params, headers: headers)
     }
 }
