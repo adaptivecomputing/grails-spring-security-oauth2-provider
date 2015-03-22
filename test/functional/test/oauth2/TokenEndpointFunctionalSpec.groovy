@@ -30,10 +30,12 @@ class TokenEndpointFunctionalSpec extends AbstractTokenEndpointFunctionalSpec {
     @Unroll
     void "invalid client requested for grant_type [#grantType]"() {
         given:
-        def params = [grant_type: grantType, client_id: 'invalid-client']
+        def clientId = 'invalid-client'
+        def params = [grant_type: grantType, client_id: clientId]
 
         expect:
-        assertAccessTokenErrorRequest(params, 401, 'invalid_client', BAD_CLIENT_CREDENTIALS, true)
+        //assertAccessTokenErrorRequest(params, 401, 'invalid_client', noClientWithRequestedId('invalid-client'), true)
+        assertAccessTokenErrorRequest(params, 401, 'unauthorized', noClientWithRequestedId('invalid-client'))
 
         where:
         _   |   grantType

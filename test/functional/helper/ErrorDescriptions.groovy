@@ -25,4 +25,9 @@ class ErrorDescriptions {
     static String unableToNarrowScope(String scope) {
         return "Unable to narrow the scope of the client authentication to [$scope]."
     }
+
+    static String noClientWithRequestedId(String clientId) {
+        return "No client with requested id: $clientId"
+    }
+
 }

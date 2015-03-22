@@ -214,7 +214,8 @@ class AuthorizationCodeFunctionalSpec extends AbstractAuthorizationEndpointFunct
 
         then:
         def tokenEndpointParams = createTokenEndpointParams('confidential-client')
-        assertAccessTokenErrorRequest(tokenEndpointParams, 401, 'invalid_client', BAD_CLIENT_CREDENTIALS)
+        // assertAccessTokenErrorRequest(tokenEndpointParams, 401, 'invalid_client', BAD_CLIENT_CREDENTIALS)
+        assertAccessTokenErrorRequest(tokenEndpointParams, 401, 'unauthorized', BAD_CREDENTIALS)
     }
 
     @Unroll

@@ -33,6 +33,7 @@ import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
 import org.springframework.http.converter.xml.SourceHttpMessageConverter
+import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.oauth2.provider.CompositeTokenGranter
 import org.springframework.security.oauth2.provider.approval.ApprovalStoreUserApprovalHandler
@@ -55,6 +56,7 @@ import org.springframework.security.oauth2.provider.password.ResourceOwnerPasswo
 import org.springframework.security.oauth2.provider.refresh.RefreshTokenGranter
 import org.springframework.security.oauth2.provider.token.DefaultAuthenticationKeyGenerator
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
+import org.springframework.security.web.access.AccessDeniedHandlerImpl
 import org.springframework.security.web.access.ExceptionTranslationFilter
 import org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint
 import org.springframework.security.web.authentication.NullRememberMeServices
@@ -490,7 +492,13 @@ class SpringSecurityOauth2ProviderGrailsPlugin {
             // provides OAuth2 specific details
             oauth2AuthenticationDetailsSource(OAuth2AuthenticationDetailsSource)
 
-            basicAuthenticationFilter(BasicAuthenticationFilter, ref('authenticationManager'), ref('oauth2AuthenticationEntryPoint')) {
+            basicClientAuthenticationManager(ProviderManager) {
+                providers = [ ref('clientCredentialsAuthenticationProvider') ]
+                authenticationEventPublisher = ref('authenticationEventPublisher')
+                eraseCredentialsAfterAuthentication = conf.providerManager.eraseCredentialsAfterAuthentication // true
+            }
+
+            basicAuthenticationFilter(BasicAuthenticationFilter, ref('basicClientAuthenticationManager'), ref('oauth2AuthenticationEntryPoint')) {
                 authenticationDetailsSource = ref('oauth2AuthenticationDetailsSource')
                 rememberMeServices = ref('statelessRememberMeServices')
                 credentialsCharset = conf.basic.credentialsCharset

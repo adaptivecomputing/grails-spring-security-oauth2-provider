@@ -25,7 +25,8 @@ class ResourceOwnerCredentialsFunctionalSpec extends AbstractTokenEndpointFuncti
         params << [client_id: 'confidential-client']
 
         expect:
-        assertAccessTokenErrorRequest(params, 401, 'invalid_client', BAD_CLIENT_CREDENTIALS)
+        //assertAccessTokenErrorRequest(params, 401, 'invalid_client', BAD_CLIENT_CREDENTIALS)
+        assertAccessTokenErrorRequest(params, 401, 'unauthorized', BAD_CREDENTIALS)
     }
 
     void "resource owner credentials with confidential client and incorrect client secret"() {
@@ -33,7 +34,8 @@ class ResourceOwnerCredentialsFunctionalSpec extends AbstractTokenEndpointFuncti
         params << [client_id: 'confidential-client', client_secret: 'incorrect']
 
         expect:
-        assertAccessTokenErrorRequest(params, 401, 'invalid_client', BAD_CLIENT_CREDENTIALS)
+        //assertAccessTokenErrorRequest(params, 401, 'invalid_client', BAD_CLIENT_CREDENTIALS)
+        assertAccessTokenErrorRequest(params, 401, 'unauthorized', BAD_CREDENTIALS)
     }
 
     void "resource owner credentials unknown user"() {
